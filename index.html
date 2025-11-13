@@ -103,12 +103,23 @@
     </div>
 
     <script type="text/javascript">
-        // A URL é relativa: o arquivo JSON está no mesmo nível que o index.html
-        var chartSpec = "./nps_dashboard.json"; 
+        // 1. Determina a URL base para projetos do GitHub (seu-usuario.github.io/seu-repositorio/)
+        // Este código é mais robusto e não depende do nome exato do repositório.
+        var baseurl = window.location.protocol + "//" + window.location.host;
+        var repoName = window.location.pathname.split('/')[1];
+        
+        // Se estiver na raiz (seu-usuario.github.io), repoName será vazio. Se não, é o nome do repositório.
+        if (repoName && repoName.length > 0) {
+            baseurl += "/" + repoName;
+        }
+
+        // Caminho final para o arquivo JSON
+        var chartSpec = baseurl + "/nps_dashboard.json"; 
 
         var options = {
             actions: false, 
             renderer: 'svg', 
+            // ... (restante das opções)
             config: {
                 title: {
                     font: 'Montserrat',
@@ -132,8 +143,8 @@
         vegaEmbed("#chart-container", chartSpec, options)
             .then(result => console.log("Gráfico NPS embutido com sucesso!"))
             .catch(error => {
-                console.error("Erro ao carregar o gráfico NPS.", error);
-                document.getElementById('chart-container').innerHTML = "<p style='color: red;'>Erro: Não foi possível carregar o gráfico. Certifique-se de que o arquivo 'nps_dashboard.json' foi carregado corretamente no GitHub.</p>";
+                console.error("Erro ao carregar o gráfico NPS. Tentativa de URL:", chartSpec, error);
+                document.getElementById('chart-container').innerHTML = "<p style='color: red;'>Erro: Não foi possível carregar o gráfico. URL de busca: <b>" + chartSpec + "</b></p>";
             });
     </script>
 
