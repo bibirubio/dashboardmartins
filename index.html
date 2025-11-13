@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Interativo de NPS - Martins Advogados</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+    <style>
+        /* --- ESTILOS CUSTOMIZADOS --- */
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FFFFFF;
+            color: #1A1A1A;
+            margin: 0;
+        }
+
+        /* Aplicação das margens de 10% (esquerdo e direito) */
+        .dashboard-container {
+            margin-left: 10%;
+            margin-right: 10%;
+            padding: 40px 0;
+        }
+        
+        /* ESTILO DE FONTES (Recuo de -60px entre letras implementado com -0.03em) */
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: #33009A;
+            letter-spacing: -0.03em;
+            font-size: 2.5em; 
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            color: #1A1A1A;
+            letter-spacing: -0.03em;
+            font-size: 1.8em; 
+        }
+
+        p {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            color: #6B6B6B;
+            letter-spacing: -0.03em;
+            line-height: 1.6;
+        }
+
+        /* ESTILO DE BOTÃO (Borda arredondada 100% e hover) */
+        .custom-button {
+            background-color: #33009A; 
+            color: #FFFFFF;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 100px; /* Borda arredondada 100% */
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.0; 
+            display: inline-block;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .custom-button:hover {
+            background-color: #FFCC00; 
+            color: #33009A; 
+        }
+        
+        /* Estilo do container do gráfico */
+        #chart-container {
+            margin-top: 30px;
+            width: 100%; 
+        }
+        
+        .vega-embed {
+            border: 1px solid #E2E2E2; 
+            padding: 20px;
+            background-color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <h1>DASHBOARD NPS SCORE</h1>
+        <p>Visão interativa da evolução mensal da satisfação dos clientes (Net Promoter Score).</p>
+        
+        <a href="#" class="custom-button">VER RELATÓRIO COMPLETO</a>
+
+        <div id="chart-container">
+            <h2>Evolução do NPS ao Longo do Tempo</h2>
+        </div>
+        
+    </div>
+
+    <script type="text/javascript">
+        // A URL é relativa: o arquivo JSON está no mesmo nível que o index.html
+        var chartSpec = "./nps_dashboard.json"; 
+
+        var options = {
+            actions: false, 
+            renderer: 'svg', 
+            config: {
+                title: {
+                    font: 'Montserrat',
+                    fontWeight: '700',
+                    fontSize: 16,
+                    color: '#33009A'
+                },
+                axis: {
+                    labelFont: 'Montserrat',
+                    titleFont: 'Montserrat',
+                    titleColor: '#6B6B6B'
+                },
+                legend: {
+                    labelFont: 'Montserrat',
+                    titleFont: 'Montserrat'
+                }
+            }
+        };
+
+        // Renderiza o gráfico
+        vegaEmbed("#chart-container", chartSpec, options)
+            .then(result => console.log("Gráfico NPS embutido com sucesso!"))
+            .catch(error => {
+                console.error("Erro ao carregar o gráfico NPS.", error);
+                document.getElementById('chart-container').innerHTML = "<p style='color: red;'>Erro: Não foi possível carregar o gráfico. Certifique-se de que o arquivo 'nps_dashboard.json' foi carregado corretamente no GitHub.</p>";
+            });
+    </script>
+
+</body>
+</html>
