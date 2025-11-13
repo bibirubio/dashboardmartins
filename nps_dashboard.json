@@ -1,0 +1,53 @@
+import pandas as pd
+import altair as alt
+
+# --- Parâmetros ---
+# Certifique-se de que o nome do arquivo abaixo está correto
+file_name = "Avaliação Martins Advogados - NPS GERAL   (respostas).xlsx - Total média.csv"
+header_row_index = 3 # A quarta linha do CSV
+
+# 1. Leitura e Preparação
+try:
+    df_nps = pd.read_csv(file_name, header=header_row_index)
+    
+    # Renomear colunas pela posição
+    col_map = {df_nps.columns[10]: 'Mês',
+               df_nps.columns[11]: 'Total clientes',
+               df_nps.columns[12]: 'NPS'}
+    df_processado = df_nps.rename(columns=col_map)
+    df_processado = df_processado[['Mês', 'Total clientes', 'NPS']].copy()
+
+    # 2. Limpeza
+    df_processado = df_processado[df_processado['Mês'] != 'Total'].copy()
+    df_processado['Total clientes'] = df_processado['Total clientes'].replace('-', pd.NA)
+    df_processado['NPS'] = df_processado['NPS'].replace('-', pd.NA)
+    df_processado.dropna(subset=['NPS', 'Total clientes'], inplace=True)
+
+    # 3. Conversão de Tipos e Cálculo do Score NPS
+    df_processado['Mês'] = pd.to_datetime(df_processado['Mês'])
+    df_processado['Total clientes'] = pd.to_numeric(df_processado['Total clientes']).astype(int)
+    df_processado['NPS'] = pd.to_numeric(df_processado['NPS'])
+    df_processado['NPS_Score'] = df_processado['NPS'] * 100
+
+    # 4. Criação do Dashboard Altair (JSON)
+    chart = alt.Chart(df_processado).mark_line(point=True).encode(
+        x=alt.X('Mês', axis=alt.Axis(title='MÊS', format='%Y-%m')),
+        y=alt.Y('NPS_Score', title='NPS SCORE', scale=alt.Scale(domain=[-100, 100])),
+
+        tooltip=[
+            alt.Tooltip('Mês', title='MÊS', format='%Y-%m'),
+            alt.Tooltip('Total clientes', title='TOTAL CLIENTES', format=','),
+            alt.Tooltip('NPS_Score', title='NPS SCORE', format='.2f')
+        ],
+        color=alt.value('#33009A')
+    ).properties(
+        title='EVOLUÇÃO MENSAL DO NPS SCORE'
+    ).interactive()
+
+    # Salva o resultado no arquivo JSON
+    chart.save('nps_dashboard.json')
+
+    print("✅ Arquivo 'nps_dashboard.json' gerado com sucesso!")
+
+except Exception as e:
+    print(f"❌ Ocorreu um erro no processamento: {e}")
